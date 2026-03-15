@@ -13,7 +13,7 @@ test('news index returns paginated news items', function () {
     $response->assertOk()
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'slug', 'title', 'description', 'content', 'date', 'img', 'thumbnail', 'link'],
+                '*' => ['id', 'slug', 'title', 'description', 'content', 'date', 'img', 'cover', 'thumbnail', 'link'],
             ],
             'meta' => ['current_page', 'last_page', 'per_page', 'total'],
         ])
@@ -32,11 +32,18 @@ test('news index supports limit query', function () {
     $response->assertOk()
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'slug', 'title', 'description', 'content', 'date', 'img', 'thumbnail', 'link'],
+                '*' => ['id', 'slug', 'title', 'description', 'content', 'date', 'img', 'cover', 'thumbnail', 'link'],
             ],
         ]);
 
     expect($response->json('data'))->toHaveCount(3);
+});
+
+test('news index validates pagination query params', function () {
+    $response = $this->getJson('/api/v1/news?perPage=0&limit=invalid');
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors(['perPage', 'limit']);
 });
 
 test('news show returns single news item by slug', function () {

@@ -40,14 +40,14 @@ class NewsForm
                 FileUpload::make('cover')
                     ->image()
                     ->acceptedFileTypes(['image/*'])
-                    ->maxSize(1024)
+                    ->maxSize(2048)
                     ->imageEditor()
                     ->columnSpanFull()
                     ->required(),
                 FileUpload::make('thumbnail')
                     ->image()
                     ->acceptedFileTypes(['image/*'])
-                    ->maxSize(1024)
+                    ->maxSize(2048)
                     ->imageEditor()
                     ->columnSpanFull()
                     ->required(),
