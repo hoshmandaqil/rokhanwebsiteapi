@@ -30,7 +30,7 @@ class DepartmentForm
                     ->label('Cover')
                     ->image()
                     ->acceptedFileTypes(['image/*'])
-                    ->maxSize(1024) ->imageEditor()
+                    ->maxSize(1024 * 10) ->imageEditor()
                     ->directory('departments')
                     ->required()
                     ->columnSpanFull(),

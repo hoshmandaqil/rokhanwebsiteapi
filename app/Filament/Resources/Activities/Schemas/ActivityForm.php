@@ -40,14 +40,14 @@ class ActivityForm
                 FileUpload::make('cover')
                     ->image()
                     ->acceptedFileTypes(['image/*'])
-                    ->maxSize(2048)
+                    ->maxSize(2048 * 5)
                     ->imageEditor()
                     ->columnSpanFull()
                     ->required(),
                 FileUpload::make('thumbnail')
                     ->image()
                     ->acceptedFileTypes(['image/*'])
-                    ->maxSize(2048)
+                    ->maxSize(2048 * 5)
                     ->imageEditor()
                     ->columnSpanFull()
                     ->required(),

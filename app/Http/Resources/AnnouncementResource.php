@@ -7,8 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
-/** @mixin \App\Models\Event */
-class EventResource extends JsonResource
+/** @mixin \App\Models\Announcement */
+class AnnouncementResource extends JsonResource
 {
     private function locale(): string
     {
@@ -62,24 +62,17 @@ class EventResource extends JsonResource
             ?? $this->getTranslation('description', $fallback)
             ?? (is_string($this->description) ? $this->description : '');
 
-        $rawLocation = $this->getTranslation('location', $locale)
-            ?? $this->getTranslation('location', $fallback)
-            ?? (is_string($this->location) ? $this->location : null);
-
         return [
             'id' => $this->id,
             'slug' => $this->slug,
-            'type' => $this->type?->value ?? '',
             'title' => $rawTitle,
             'description' => trim(strip_tags($rawDescription)),
             'content' => $rawDescription,
-            'location' => $rawLocation,
-            'start_at' => $this->start_at?->toIso8601String(),
-            'end_at' => $this->end_at?->toIso8601String(),
+            'date' => $this->date?->format('F j, Y') ?? '',
             'img' => $this->toAbsoluteUrl($this->cover) ?? '',
             'cover' => $this->toAbsoluteUrl($this->cover),
             'thumbnail' => $this->toAbsoluteUrl($this->thumbnail),
-            'link' => '/events/'.$this->slug,
+            'link' => '/announcements/'.$this->slug,
         ];
     }
 }

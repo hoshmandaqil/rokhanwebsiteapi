@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Faculties\Schemas;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 
 class FacultyForm
@@ -28,7 +27,7 @@ class FacultyForm
                 FileUpload::make('cover')
                     ->image()
                     ->acceptedFileTypes(['image/*'])
-                    ->maxSize(1024)
+                    ->maxSize(1024 * 10)
                     ->imageEditor()
                     ->directory('faculties')
                     ->required()

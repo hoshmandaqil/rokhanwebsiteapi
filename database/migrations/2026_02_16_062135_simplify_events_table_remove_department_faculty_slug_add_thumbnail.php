@@ -20,10 +20,6 @@ return new class extends Migration
                 $table->dropForeign(['faculty_id']);
                 $table->dropColumn('faculty_id');
             }
-            if (Schema::hasColumn('events', 'slug')) {
-                $table->dropUnique(['slug']);
-                $table->dropColumn('slug');
-            }
             if (Schema::hasColumn('events', 'registration_url')) {
                 $table->dropColumn('registration_url');
             }
@@ -42,7 +38,6 @@ return new class extends Migration
             $table->dropColumn('thumbnail');
             $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('faculty_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('slug')->unique();
             $table->string('registration_url')->nullable();
         });
     }

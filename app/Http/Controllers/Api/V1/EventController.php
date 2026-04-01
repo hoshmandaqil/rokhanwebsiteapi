@@ -45,15 +45,16 @@ class EventController extends Controller
     }
 
     /**
-     * Show a single published event by id.
+     * Show a single published event by slug.
      */
-    public function show(Request $request, int $event): JsonResponse
+    public function show(Request $request, Event $event): JsonResponse
     {
         $this->resolveLocale($request);
 
         $record = Event::query()
             ->published()
-            ->findOrFail($event);
+            ->whereKey($event->id)
+            ->firstOrFail();
 
         return (new EventResource($record))->toResponse($request);
     }

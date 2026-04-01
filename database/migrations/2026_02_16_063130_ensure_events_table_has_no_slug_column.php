@@ -20,10 +20,6 @@ return new class extends Migration
                 $table->dropForeign(['faculty_id']);
                 $table->dropColumn('faculty_id');
             }
-            if (Schema::hasColumn('events', 'slug')) {
-                $table->dropUnique(['slug']);
-                $table->dropColumn('slug');
-            }
             if (Schema::hasColumn('events', 'registration_url')) {
                 $table->dropColumn('registration_url');
             }

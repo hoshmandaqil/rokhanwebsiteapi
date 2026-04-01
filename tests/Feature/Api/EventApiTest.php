@@ -15,7 +15,7 @@ test('events index returns paginated published events', function () {
     $response->assertOk()
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'type', 'title', 'description', 'content', 'location', 'start_at', 'end_at', 'img', 'cover', 'thumbnail', 'link'],
+                '*' => ['id', 'slug', 'type', 'title', 'description', 'content', 'location', 'start_at', 'end_at', 'img', 'cover', 'thumbnail', 'link'],
             ],
             'meta' => ['current_page', 'last_page', 'per_page', 'total'],
         ])
@@ -35,7 +35,7 @@ test('events index supports limit and type query', function () {
     $response->assertOk()
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'type', 'title', 'description', 'content', 'location', 'start_at', 'end_at', 'img', 'cover', 'thumbnail', 'link'],
+                '*' => ['id', 'slug', 'type', 'title', 'description', 'content', 'location', 'start_at', 'end_at', 'img', 'cover', 'thumbnail', 'link'],
             ],
         ]);
 
@@ -50,32 +50,36 @@ test('events index validates pagination and type query params', function () {
         ->assertJsonValidationErrors(['perPage', 'limit', 'type']);
 });
 
-test('events show returns a single published event by id', function () {
+test('events show returns a single published event by slug', function () {
     $event = Event::factory()->published()->create([
         'type' => EventType::Conference,
         'title' => ['en' => 'Test Event'],
+        'slug' => 'test-event',
         'description' => ['en' => '<p>Event description</p>'],
         'location' => ['en' => 'Main Hall'],
         'cover' => 'events/test-cover.jpg',
         'thumbnail' => 'events/test-thumbnail.jpg',
     ]);
 
-    $response = $this->getJson('/api/v1/events/'.$event->id);
+    $response = $this->getJson('/api/v1/events/'.$event->slug);
 
     $response->assertOk()
         ->assertJsonPath('data.id', $event->id)
+        ->assertJsonPath('data.slug', 'test-event')
         ->assertJsonPath('data.type', 'conference')
         ->assertJsonPath('data.title', 'Test Event')
         ->assertJsonPath('data.description', 'Event description')
         ->assertJsonPath('data.location', 'Main Hall')
-        ->assertJsonPath('data.link', '/events/'.$event->id);
+        ->assertJsonPath('data.link', '/events/test-event');
 });
 
-test('events show returns 404 for unknown or draft event', function () {
-    $draft = Event::factory()->draft()->create();
+test('events show returns 404 for unknown or draft event slug', function () {
+    $draft = Event::factory()->draft()->create([
+        'slug' => 'draft-event',
+    ]);
 
-    $notFoundResponse = $this->getJson('/api/v1/events/999999');
-    $draftResponse = $this->getJson('/api/v1/events/'.$draft->id);
+    $notFoundResponse = $this->getJson('/api/v1/events/non-existent-event');
+    $draftResponse = $this->getJson('/api/v1/events/'.$draft->slug);
 
     $notFoundResponse->assertNotFound();
     $draftResponse->assertNotFound();
@@ -87,6 +91,7 @@ test('events api respects locale query param', function () {
             'en' => 'English Event',
             'ar' => 'فعالية عربية',
         ],
+        'slug' => 'localized-event',
         'description' => [
             'en' => '<p>English description</p>',
             'ar' => '<p>وصف عربي</p>',
@@ -97,8 +102,8 @@ test('events api respects locale query param', function () {
         ],
     ]);
 
-    $responseEn = $this->getJson('/api/v1/events/'.$event->id.'?locale=en');
-    $responseAr = $this->getJson('/api/v1/events/'.$event->id.'?locale=ar');
+    $responseEn = $this->getJson('/api/v1/events/'.$event->slug.'?locale=en');
+    $responseAr = $this->getJson('/api/v1/events/'.$event->slug.'?locale=ar');
 
     $responseEn->assertOk()
         ->assertJsonPath('data.title', 'English Event')

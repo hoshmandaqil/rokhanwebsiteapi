@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\News\Schemas;
+namespace App\Filament\Resources\Announcements\Schemas;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -10,7 +10,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 
-class NewsForm
+class AnnouncementForm
 {
     public static function configure(Schema $schema): Schema
     {

@@ -20,10 +20,12 @@ class EventFactory extends Factory
     {
         $startAt = fake()->dateTimeBetween('now', '+3 months');
         $endAt = fake()->optional(0.7)->dateTimeBetween($startAt, (clone $startAt)->modify('+3 days'));
+        $title = fake()->sentence(4);
 
         return [
             'type' => fake()->randomElement(EventType::cases()),
-            'title' => ['en' => fake()->sentence(4)],
+            'title' => ['en' => $title],
+            'slug' => \Illuminate\Support\Str::slug($title).'-'.fake()->unique()->numberBetween(1, 99999),
             'description' => ['en' => fake()->paragraphs(3, true)],
             'location' => ['en' => fake()->optional(0.8)->address()],
             'start_at' => $startAt,
@@ -34,17 +36,11 @@ class EventFactory extends Factory
         ];
     }
 
-    /**
-     * @return static
-     */
     public function published(): static
     {
         return $this->state(fn (array $attributes) => ['is_published' => true]);
     }
 
-    /**
-     * @return static
-     */
     public function draft(): static
     {
         return $this->state(fn (array $attributes) => ['is_published' => false]);
