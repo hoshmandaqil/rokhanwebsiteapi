@@ -2,9 +2,12 @@
 
 use App\Enums\PlanScope;
 use App\Enums\PlanType;
+use App\Enums\ProgramLevel;
 use App\Models\Department;
 use App\Models\Faculty;
+use App\Models\Instructor;
 use App\Models\Plan;
+use App\Models\Program;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -21,11 +24,13 @@ test('faculties index returns faculty items', function () {
                     'id',
                     'title',
                     'description',
-                    'overview',
+                    'deanMessage',
+                    'vision',
+                    'mission',
                     'cover',
-                    'programs' => [
-                        '*' => ['id', 'title', 'description', 'cover', 'faculty_id', 'created_at', 'updated_at'],
-                    ],
+                    'departments',
+                    'degreePrograms',
+                    'faculty_profile',
                     'strategic_plans',
                 ],
             ],
@@ -38,14 +43,27 @@ test('faculties show returns single faculty item by id', function () {
     $faculty = Faculty::factory()->create([
         'title' => ['en' => 'Engineering Faculty'],
         'description' => ['en' => 'Engineering faculty description'],
+        'dean_message' => ['en' => '<p>Welcome from the dean.</p>'],
+        'mission_content' => ['en' => 'Engineering mission'],
+        'vision_content' => ['en' => 'Engineering vision'],
         'cover' => 'faculties/test-cover.jpg',
     ]);
 
-    Department::query()->create([
+    $department = Department::query()->create([
         'title' => ['en' => 'Software Engineering'],
         'description' => ['en' => 'Software program'],
         'cover' => 'departments/software.jpg',
         'faculty_id' => $faculty->id,
+    ]);
+
+    Program::query()->create([
+        'department_id' => $department->id,
+        'level' => ProgramLevel::Bachelor,
+        'slug' => 'bsc-software',
+        'title' => ['en' => 'BSc Software'],
+        'description' => ['en' => '<p>Program description</p>'],
+        'sort_order' => 1,
+        'is_published' => true,
     ]);
 
     Plan::factory()->create([
@@ -60,15 +78,32 @@ test('faculties show returns single faculty item by id', function () {
         'file' => 'plans/strategic.pdf',
     ]);
 
+    $instructor = Instructor::factory()->create([
+        'faculty_id' => $faculty->id,
+        'name' => ['en' => 'Dr. Jane Instructor'],
+        'title' => ['en' => 'Assistant Professor'],
+        'photo' => 'instructors/jane.jpg',
+    ]);
+
+    $faculty->update([
+        'faculty_profile_instructor_ids' => [$instructor->id],
+    ]);
+
     $response = $this->getJson('/api/v1/faculties/'.$faculty->id);
 
     $response->assertOk()
         ->assertJsonPath('data.id', $faculty->id)
         ->assertJsonPath('data.title', 'Engineering Faculty')
         ->assertJsonPath('data.description', 'Engineering faculty description')
-        ->assertJsonPath('data.overview', 'Engineering faculty description')
-        ->assertJsonPath('data.programs.0.title', 'Software Engineering')
-        ->assertJsonPath('data.programs.0.faculty_id', $faculty->id)
+        ->assertJsonPath('data.deanMessage', '<p>Welcome from the dean.</p>')
+        ->assertJsonPath('data.mission', 'Engineering mission')
+        ->assertJsonPath('data.vision', 'Engineering vision')
+        ->assertJsonPath('data.departments.0.title', 'Software Engineering')
+        ->assertJsonPath('data.departments.0.faculty_id', $faculty->id)
+        ->assertJsonPath('data.degreePrograms.0.slug', 'bsc-software')
+        ->assertJsonPath('data.degreePrograms.0.title', 'BSc Software')
+        ->assertJsonPath('data.faculty_profile.0.name', 'Dr. Jane Instructor')
+        ->assertJsonPath('data.faculty_profile.0.title', 'Assistant Professor')
         ->assertJsonPath('data.strategic_plans.0.title', 'Faculty Strategic Plan');
 });
 
@@ -88,12 +123,24 @@ test('faculties api respects locale query param', function () {
             'en' => 'English description',
             'ar' => 'وصف عربي',
         ],
+        'dean_message' => [
+            'en' => '<p>English dean</p>',
+            'ar' => '<p>عميد عربي</p>',
+        ],
+        'mission_content' => [
+            'en' => 'English mission',
+            'ar' => 'مهمة عربية',
+        ],
+        'vision_content' => [
+            'en' => 'English vision',
+            'ar' => 'رؤية عربية',
+        ],
     ]);
 
-    Department::query()->create([
+    $department = Department::query()->create([
         'title' => [
-            'en' => 'English Program',
-            'ar' => 'برنامج عربي',
+            'en' => 'English Department',
+            'ar' => 'قسم عربي',
         ],
         'description' => [
             'en' => 'English program description',
@@ -125,14 +172,18 @@ test('faculties api respects locale query param', function () {
     $responseEn->assertOk()
         ->assertJsonPath('data.title', 'English Faculty')
         ->assertJsonPath('data.description', 'English description')
-        ->assertJsonPath('data.overview', 'English description')
-        ->assertJsonPath('data.programs.0.title', 'English Program')
+        ->assertJsonPath('data.deanMessage', '<p>English dean</p>')
+        ->assertJsonPath('data.mission', 'English mission')
+        ->assertJsonPath('data.vision', 'English vision')
+        ->assertJsonPath('data.departments.0.title', 'English Department')
         ->assertJsonPath('data.strategic_plans.0.title', 'English Strategic Plan');
 
     $responseAr->assertOk()
         ->assertJsonPath('data.title', 'كلية عربية')
         ->assertJsonPath('data.description', 'وصف عربي')
-        ->assertJsonPath('data.overview', 'وصف عربي')
-        ->assertJsonPath('data.programs.0.title', 'برنامج عربي')
+        ->assertJsonPath('data.deanMessage', '<p>عميد عربي</p>')
+        ->assertJsonPath('data.mission', 'مهمة عربية')
+        ->assertJsonPath('data.vision', 'رؤية عربية')
+        ->assertJsonPath('data.departments.0.title', 'قسم عربي')
         ->assertJsonPath('data.strategic_plans.0.title', 'خطة استراتيجية عربية');
 });

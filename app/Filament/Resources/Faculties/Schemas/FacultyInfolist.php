@@ -33,6 +33,24 @@ class FacultyInfolist
                             ->prose()
                             ->placeholder('—')
                             ->columnSpanFull(),
+                        TextEntry::make('dean_message')
+                            ->label("Dean's message")
+                            ->html()
+                            ->prose()
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                        TextEntry::make('mission_content')
+                            ->label('Mission content')
+                            ->html()
+                            ->prose()
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                        TextEntry::make('vision_content')
+                            ->label('Vision content')
+                            ->html()
+                            ->prose()
+                            ->placeholder('—')
+                            ->columnSpanFull(),
                     ])
                     ->columns(1)
                     ->columnSpanFull(),

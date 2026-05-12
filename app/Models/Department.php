@@ -38,4 +38,12 @@ class Department extends Model
     {
         return $this->hasMany(Plan::class);
     }
+
+    /**
+     * @return HasMany<Program, $this>
+     */
+    public function programs(): HasMany
+    {
+        return $this->hasMany(Program::class);
+    }
 }

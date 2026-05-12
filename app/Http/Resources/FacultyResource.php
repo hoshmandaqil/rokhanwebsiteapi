@@ -62,8 +62,20 @@ class FacultyResource extends JsonResource
             ?? $this->getTranslation('description', $fallback)
             ?? (is_string($this->description) ? $this->description : '');
 
-        $programs = $this->departments->map(function ($department) use ($locale, $fallback): array {
-            $title = $department->getTranslation('title', $locale)
+        $deanMessage = $this->getTranslation('dean_message', $locale)
+            ?? $this->getTranslation('dean_message', $fallback)
+            ?? '';
+
+        $mission = $this->getTranslation('mission_content', $locale)
+            ?? $this->getTranslation('mission_content', $fallback)
+            ?? '';
+
+        $vision = $this->getTranslation('vision_content', $locale)
+            ?? $this->getTranslation('vision_content', $fallback)
+            ?? '';
+
+        $departments = $this->departments->map(function ($department) use ($locale, $fallback): array {
+            $deptTitle = $department->getTranslation('title', $locale)
                 ?? $department->getTranslation('title', $fallback)
                 ?? (is_string($department->title) ? $department->title : '');
 
@@ -73,7 +85,7 @@ class FacultyResource extends JsonResource
 
             return [
                 'id' => $department->id,
-                'title' => $title,
+                'title' => $deptTitle,
                 'description' => $programDescription,
                 'cover' => $this->toAbsoluteUrl($department->cover),
                 'faculty_id' => $department->faculty_id,
@@ -82,8 +94,29 @@ class FacultyResource extends JsonResource
             ];
         })->values()->all();
 
+        $degreePrograms = collect();
+        foreach ($this->departments as $department) {
+            foreach ($department->programs as $program) {
+                if (! $program->is_published) {
+                    continue;
+                }
+                $degreePrograms[$program->id] = $program;
+            }
+        }
+
+        $degreeProgramsPayload = $degreePrograms
+            ->values()
+            ->sort(function ($a, $b): int {
+                $order = ($a->sort_order ?? 0) <=> ($b->sort_order ?? 0);
+
+                return $order !== 0 ? $order : $a->id <=> $b->id;
+            })
+            ->values()
+            ->map(fn ($program) => (new ProgramResource($program))->toArray($request))
+            ->all();
+
         $strategicPlans = $this->strategicPlans->map(function ($plan) use ($locale, $fallback): array {
-            $title = $plan->getTranslation('title', $locale)
+            $planTitle = $plan->getTranslation('title', $locale)
                 ?? $plan->getTranslation('title', $fallback)
                 ?? (is_string($plan->title) ? $plan->title : '');
 
@@ -93,7 +126,7 @@ class FacultyResource extends JsonResource
 
             return [
                 'id' => $plan->id,
-                'title' => $title,
+                'title' => $planTitle,
                 'description' => $planDescription,
                 'slug' => $plan->slug,
                 'poster' => $this->toAbsoluteUrl($plan->poster),
@@ -101,13 +134,49 @@ class FacultyResource extends JsonResource
             ];
         })->values()->all();
 
+        $profileIds = array_values(array_unique(array_filter(
+            array_map(
+                static fn ($id): int => (int) $id,
+                is_array($this->faculty_profile_instructor_ids) ? $this->faculty_profile_instructor_ids : [],
+            ),
+            static fn (int $id): bool => $id > 0,
+        )));
+
+        $facultyProfile = $this->instructors
+            ->whereIn('id', $profileIds)
+            ->sortBy(fn ($instructor) => array_search($instructor->id, $profileIds, true))
+            ->values()
+            ->map(function ($instructor) use ($locale, $fallback): array {
+                $name = $instructor->getTranslation('name', $locale)
+                    ?? $instructor->getTranslation('name', $fallback)
+                    ?? (is_string($instructor->name) ? $instructor->name : '');
+
+                $jobTitle = $instructor->getTranslation('title', $locale)
+                    ?? $instructor->getTranslation('title', $fallback)
+                    ?? (is_string($instructor->title) ? $instructor->title : '');
+
+                return [
+                    'id' => $instructor->id,
+                    'name' => $name,
+                    'title' => $jobTitle,
+                    'role' => $jobTitle,
+                    'photo' => $this->toAbsoluteUrl($instructor->photo),
+                ];
+            })
+            ->all();
+
         return [
             'id' => $this->id,
+            'slug' => (string) $this->id,
             'title' => $title,
             'description' => $description,
-            'overview' => $description,
+            'deanMessage' => is_string($deanMessage) ? $deanMessage : '',
+            'vision' => is_string($vision) ? $vision : '',
+            'mission' => is_string($mission) ? $mission : '',
             'cover' => $this->toAbsoluteUrl($this->cover),
-            'programs' => $programs,
+            'departments' => $departments,
+            'degreePrograms' => $degreeProgramsPayload,
+            'faculty_profile' => $facultyProfile,
             'strategic_plans' => $strategicPlans,
         ];
     }

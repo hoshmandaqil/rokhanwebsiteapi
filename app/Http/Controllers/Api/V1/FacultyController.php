@@ -21,7 +21,11 @@ class FacultyController extends Controller
         $this->resolveLocale($request);
 
         $faculties = Faculty::query()
-            ->with(['departments', 'strategicPlans'])
+            ->with([
+                'departments.programs',
+                'strategicPlans',
+                'instructors',
+            ])
             ->orderBy('created_at')
             ->get();
 
@@ -35,7 +39,11 @@ class FacultyController extends Controller
     {
         $this->resolveLocale($request);
 
-        $faculty->loadMissing(['departments', 'strategicPlans']);
+        $faculty->loadMissing([
+            'departments.programs',
+            'strategicPlans',
+            'instructors',
+        ]);
 
         return (new FacultyResource($faculty))->toResponse($request);
     }

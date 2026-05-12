@@ -16,13 +16,33 @@ class Faculty extends Model
 
     use HasTranslations;
 
-    public $translatable = ['title', 'description'];
+    public $translatable = [
+        'title',
+        'description',
+        'dean_message',
+        'mission_content',
+        'vision_content',
+    ];
 
     protected $fillable = [
         'title',
         'description',
         'cover',
+        'dean_message',
+        'mission_content',
+        'vision_content',
+        'faculty_profile_instructor_ids',
     ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'faculty_profile_instructor_ids' => 'array',
+        ];
+    }
 
     /**
      * @return HasMany<LeadershipMessage, $this>
@@ -56,5 +76,13 @@ class Faculty extends Model
         return $this->hasMany(Plan::class)
             ->where('scope', PlanScope::Faculty)
             ->where('type', PlanType::StrategicPlan);
+    }
+
+    /**
+     * @return HasMany<Instructor, $this>
+     */
+    public function instructors(): HasMany
+    {
+        return $this->hasMany(Instructor::class);
     }
 }
