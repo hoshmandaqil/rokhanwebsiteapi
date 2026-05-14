@@ -75,23 +75,23 @@ test('announcements api respects locale query param', function () {
     Announcement::factory()->create([
         'title' => [
             'en' => 'English Announcement',
-            'ar' => 'إعلان عربي',
+            'prs' => 'اعلان دری',
         ],
         'description' => [
             'en' => '<p>English description</p>',
-            'ar' => '<p>وصف عربي</p>',
+            'prs' => '<p>توضیح دری</p>',
         ],
         'slug' => 'localized-announcement',
     ]);
 
     $responseEn = $this->getJson('/api/v1/announcements/localized-announcement?locale=en');
-    $responseAr = $this->getJson('/api/v1/announcements/localized-announcement?locale=ar');
+    $responsePrs = $this->getJson('/api/v1/announcements/localized-announcement?locale=prs');
 
     $responseEn->assertOk()
         ->assertJsonPath('data.title', 'English Announcement')
         ->assertJsonPath('data.description', 'English description');
 
-    $responseAr->assertOk()
-        ->assertJsonPath('data.title', 'إعلان عربي')
-        ->assertJsonPath('data.description', 'وصف عربي');
+    $responsePrs->assertOk()
+        ->assertJsonPath('data.title', 'اعلان دری')
+        ->assertJsonPath('data.description', 'توضیح دری');
 });

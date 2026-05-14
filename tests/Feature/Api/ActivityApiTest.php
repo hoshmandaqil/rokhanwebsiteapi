@@ -75,23 +75,23 @@ test('activities api respects locale query param', function () {
     Activity::factory()->create([
         'title' => [
             'en' => 'English Activity',
-            'ar' => 'نشاط عربي',
+            'prs' => 'فعالیت دری',
         ],
         'description' => [
             'en' => '<p>English description</p>',
-            'ar' => '<p>وصف عربي</p>',
+            'prs' => '<p>توضیح دری</p>',
         ],
         'slug' => 'localized-activity',
     ]);
 
     $responseEn = $this->getJson('/api/v1/activities/localized-activity?locale=en');
-    $responseAr = $this->getJson('/api/v1/activities/localized-activity?locale=ar');
+    $responsePrs = $this->getJson('/api/v1/activities/localized-activity?locale=prs');
 
     $responseEn->assertOk()
         ->assertJsonPath('data.title', 'English Activity')
         ->assertJsonPath('data.description', 'English description');
 
-    $responseAr->assertOk()
-        ->assertJsonPath('data.title', 'نشاط عربي')
-        ->assertJsonPath('data.description', 'وصف عربي');
+    $responsePrs->assertOk()
+        ->assertJsonPath('data.title', 'فعالیت دری')
+        ->assertJsonPath('data.description', 'توضیح دری');
 });

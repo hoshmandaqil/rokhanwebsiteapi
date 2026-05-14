@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\ProgramLevel;
+use App\Support\ApiLocaleTranslation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -11,11 +12,6 @@ use Throwable;
 /** @mixin \App\Models\Program */
 class ProgramResource extends JsonResource
 {
-    private function locale(): string
-    {
-        return request()->attributes->get('api_locale', config('app.fallback_locale', 'en'));
-    }
-
     private function toAbsoluteUrl(?string $path): ?string
     {
         if (blank($path)) {
@@ -49,24 +45,12 @@ class ProgramResource extends JsonResource
 
     private function translateHtml(string $field): string
     {
-        $locale = $this->locale();
-        $fallback = config('app.fallback_locale', 'en');
-        $raw = $this->getTranslation($field, $locale)
-            ?? $this->getTranslation($field, $fallback)
-            ?? '';
-
-        return is_string($raw) ? $raw : '';
+        return ApiLocaleTranslation::pick($this->resource, $field);
     }
 
     private function translateDegree(): string
     {
-        $locale = $this->locale();
-        $fallback = config('app.fallback_locale', 'en');
-        $raw = $this->getTranslation('degree', $locale)
-            ?? $this->getTranslation('degree', $fallback)
-            ?? '';
-
-        return is_string($raw) ? $raw : '';
+        return ApiLocaleTranslation::pick($this->resource, 'degree');
     }
 
     /**
@@ -81,13 +65,7 @@ class ProgramResource extends JsonResource
         $path = $level->pathSegment();
         $slug = $this->slug;
 
-        $locale = $this->locale();
-        $fallback = config('app.fallback_locale', 'en');
-
-        $title = $this->getTranslation('title', $locale)
-            ?? $this->getTranslation('title', $fallback)
-            ?? '';
-        $title = is_string($title) ? trim(strip_tags($title)) : '';
+        $title = trim(strip_tags(ApiLocaleTranslation::pick($this->resource, 'title')));
 
         $descriptionHtml = $this->translateHtml('description');
         $descriptionPlain = trim(strip_tags($descriptionHtml));
@@ -95,13 +73,7 @@ class ProgramResource extends JsonResource
 
         $departmentTitle = '';
         if ($this->relationLoaded('department') && $this->department) {
-            $dept = $this->department;
-            $departmentTitle = $dept->getTranslation('title', $this->locale())
-                ?? $dept->getTranslation('title', config('app.fallback_locale', 'en'))
-                ?? '';
-            if (! is_string($departmentTitle)) {
-                $departmentTitle = '';
-            }
+            $departmentTitle = ApiLocaleTranslation::pick($this->department, 'title');
         }
 
         $cover = $this->toAbsoluteUrl($this->cover);

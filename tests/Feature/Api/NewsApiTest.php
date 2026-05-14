@@ -75,23 +75,36 @@ test('news api respects locale query param', function () {
     News::factory()->create([
         'title' => [
             'en' => 'English News',
-            'ar' => 'خبر عربي',
+            'prs' => 'خبر دری',
         ],
         'description' => [
             'en' => '<p>English description</p>',
-            'ar' => '<p>وصف عربي</p>',
+            'prs' => '<p>وصف دری</p>',
         ],
         'slug' => 'localized-news',
     ]);
 
     $responseEn = $this->getJson('/api/v1/news/localized-news?locale=en');
-    $responseAr = $this->getJson('/api/v1/news/localized-news?locale=ar');
+    $responsePrs = $this->getJson('/api/v1/news/localized-news?locale=prs');
 
     $responseEn->assertOk()
         ->assertJsonPath('data.title', 'English News')
         ->assertJsonPath('data.description', 'English description');
 
-    $responseAr->assertOk()
-        ->assertJsonPath('data.title', 'خبر عربي')
-        ->assertJsonPath('data.description', 'وصف عربي');
+    $responsePrs->assertOk()
+        ->assertJsonPath('data.title', 'خبر دری')
+        ->assertJsonPath('data.description', 'وصف دری');
+});
+
+test('non-fallback api locale does not substitute English when translation is missing', function () {
+    News::factory()->create([
+        'title' => ['en' => 'English Only'],
+        'description' => ['en' => '<p>English only body</p>'],
+        'slug' => 'english-only-translation',
+    ]);
+
+    $this->getJson('/api/v1/news/english-only-translation?locale=prs')
+        ->assertOk()
+        ->assertJsonPath('data.title', '')
+        ->assertJsonPath('data.description', '');
 });

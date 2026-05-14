@@ -53,23 +53,23 @@ test('facility api respects locale query param', function () {
     $facility = Facility::factory()->create([
         'title' => [
             'en' => 'English Title',
-            'ar' => 'العنوان بالعربية',
+            'prs' => 'عنوان دری',
         ],
         'description' => [
             'en' => 'English description',
-            'ar' => 'الوصف بالعربية',
+            'prs' => 'توضیح دری',
         ],
         'slug' => 'test-facility',
     ]);
 
     $responseEn = $this->getJson('/api/v1/facilities/test-facility?locale=en');
-    $responseAr = $this->getJson('/api/v1/facilities/test-facility?locale=ar');
+    $responsePrs = $this->getJson('/api/v1/facilities/test-facility?locale=prs');
 
     $responseEn->assertOk()
         ->assertJsonPath('data.title', 'English Title')
         ->assertJsonPath('data.description', 'English description');
 
-    $responseAr->assertOk()
-        ->assertJsonPath('data.title', 'العنوان بالعربية')
-        ->assertJsonPath('data.description', 'الوصف بالعربية');
+    $responsePrs->assertOk()
+        ->assertJsonPath('data.title', 'عنوان دری')
+        ->assertJsonPath('data.description', 'توضیح دری');
 });

@@ -89,29 +89,29 @@ test('events api respects locale query param', function () {
     $event = Event::factory()->published()->create([
         'title' => [
             'en' => 'English Event',
-            'ar' => 'فعالية عربية',
+            'prs' => 'رویداد دری',
         ],
         'slug' => 'localized-event',
         'description' => [
             'en' => '<p>English description</p>',
-            'ar' => '<p>وصف عربي</p>',
+            'prs' => '<p>توضیح دری</p>',
         ],
         'location' => [
             'en' => 'English Location',
-            'ar' => 'موقع عربي',
+            'prs' => 'مکان دری',
         ],
     ]);
 
     $responseEn = $this->getJson('/api/v1/events/'.$event->slug.'?locale=en');
-    $responseAr = $this->getJson('/api/v1/events/'.$event->slug.'?locale=ar');
+    $responsePrs = $this->getJson('/api/v1/events/'.$event->slug.'?locale=prs');
 
     $responseEn->assertOk()
         ->assertJsonPath('data.title', 'English Event')
         ->assertJsonPath('data.description', 'English description')
         ->assertJsonPath('data.location', 'English Location');
 
-    $responseAr->assertOk()
-        ->assertJsonPath('data.title', 'فعالية عربية')
-        ->assertJsonPath('data.description', 'وصف عربي')
-        ->assertJsonPath('data.location', 'موقع عربي');
+    $responsePrs->assertOk()
+        ->assertJsonPath('data.title', 'رویداد دری')
+        ->assertJsonPath('data.description', 'توضیح دری')
+        ->assertJsonPath('data.location', 'مکان دری');
 });

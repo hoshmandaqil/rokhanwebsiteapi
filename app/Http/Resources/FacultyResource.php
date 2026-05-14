@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\ApiLocaleTranslation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -10,11 +11,6 @@ use Throwable;
 /** @mixin \App\Models\Faculty */
 class FacultyResource extends JsonResource
 {
-    private function locale(): string
-    {
-        return request()->attributes->get('api_locale', config('app.fallback_locale', 'en'));
-    }
-
     private function toAbsoluteUrl(?string $path): ?string
     {
         if (blank($path)) {
@@ -51,37 +47,15 @@ class FacultyResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $locale = $this->locale();
-        $fallback = config('app.fallback_locale', 'en');
+        $title = ApiLocaleTranslation::pick($this->resource, 'title');
+        $description = ApiLocaleTranslation::pick($this->resource, 'description');
+        $deanMessage = ApiLocaleTranslation::pick($this->resource, 'dean_message');
+        $mission = ApiLocaleTranslation::pick($this->resource, 'mission_content');
+        $vision = ApiLocaleTranslation::pick($this->resource, 'vision_content');
 
-        $title = $this->getTranslation('title', $locale)
-            ?? $this->getTranslation('title', $fallback)
-            ?? (is_string($this->title) ? $this->title : '');
-
-        $description = $this->getTranslation('description', $locale)
-            ?? $this->getTranslation('description', $fallback)
-            ?? (is_string($this->description) ? $this->description : '');
-
-        $deanMessage = $this->getTranslation('dean_message', $locale)
-            ?? $this->getTranslation('dean_message', $fallback)
-            ?? '';
-
-        $mission = $this->getTranslation('mission_content', $locale)
-            ?? $this->getTranslation('mission_content', $fallback)
-            ?? '';
-
-        $vision = $this->getTranslation('vision_content', $locale)
-            ?? $this->getTranslation('vision_content', $fallback)
-            ?? '';
-
-        $departments = $this->departments->map(function ($department) use ($locale, $fallback): array {
-            $deptTitle = $department->getTranslation('title', $locale)
-                ?? $department->getTranslation('title', $fallback)
-                ?? (is_string($department->title) ? $department->title : '');
-
-            $programDescription = $department->getTranslation('description', $locale)
-                ?? $department->getTranslation('description', $fallback)
-                ?? (is_string($department->description) ? $department->description : '');
+        $departments = $this->departments->map(function ($department): array {
+            $deptTitle = ApiLocaleTranslation::pick($department, 'title');
+            $programDescription = ApiLocaleTranslation::pick($department, 'description');
 
             return [
                 'id' => $department->id,
@@ -115,14 +89,9 @@ class FacultyResource extends JsonResource
             ->map(fn ($program) => (new ProgramResource($program))->toArray($request))
             ->all();
 
-        $strategicPlans = $this->strategicPlans->map(function ($plan) use ($locale, $fallback): array {
-            $planTitle = $plan->getTranslation('title', $locale)
-                ?? $plan->getTranslation('title', $fallback)
-                ?? (is_string($plan->title) ? $plan->title : '');
-
-            $planDescription = $plan->getTranslation('description', $locale)
-                ?? $plan->getTranslation('description', $fallback)
-                ?? (is_string($plan->description) ? $plan->description : '');
+        $strategicPlans = $this->strategicPlans->map(function ($plan): array {
+            $planTitle = ApiLocaleTranslation::pick($plan, 'title');
+            $planDescription = ApiLocaleTranslation::pick($plan, 'description');
 
             return [
                 'id' => $plan->id,
@@ -146,14 +115,9 @@ class FacultyResource extends JsonResource
             ->whereIn('id', $profileIds)
             ->sortBy(fn ($instructor) => array_search($instructor->id, $profileIds, true))
             ->values()
-            ->map(function ($instructor) use ($locale, $fallback): array {
-                $name = $instructor->getTranslation('name', $locale)
-                    ?? $instructor->getTranslation('name', $fallback)
-                    ?? (is_string($instructor->name) ? $instructor->name : '');
-
-                $jobTitle = $instructor->getTranslation('title', $locale)
-                    ?? $instructor->getTranslation('title', $fallback)
-                    ?? (is_string($instructor->title) ? $instructor->title : '');
+            ->map(function ($instructor): array {
+                $name = ApiLocaleTranslation::pick($instructor, 'name');
+                $jobTitle = ApiLocaleTranslation::pick($instructor, 'title');
 
                 return [
                     'id' => $instructor->id,

@@ -117,34 +117,34 @@ test('faculties api respects locale query param', function () {
     $faculty = Faculty::factory()->create([
         'title' => [
             'en' => 'English Faculty',
-            'ar' => 'كلية عربية',
+            'prs' => 'پوهنځی دری',
         ],
         'description' => [
             'en' => 'English description',
-            'ar' => 'وصف عربي',
+            'prs' => 'توضیح دری',
         ],
         'dean_message' => [
             'en' => '<p>English dean</p>',
-            'ar' => '<p>عميد عربي</p>',
+            'prs' => '<p>مقام دری</p>',
         ],
         'mission_content' => [
             'en' => 'English mission',
-            'ar' => 'مهمة عربية',
+            'prs' => 'ماموریت دری',
         ],
         'vision_content' => [
             'en' => 'English vision',
-            'ar' => 'رؤية عربية',
+            'prs' => 'بینش دری',
         ],
     ]);
 
     $department = Department::query()->create([
         'title' => [
             'en' => 'English Department',
-            'ar' => 'قسم عربي',
+            'prs' => 'دیپارتمنت دری',
         ],
         'description' => [
             'en' => 'English program description',
-            'ar' => 'وصف برنامج عربي',
+            'prs' => 'توضیح برنامه دری',
         ],
         'cover' => 'departments/program.jpg',
         'faculty_id' => $faculty->id,
@@ -157,17 +157,17 @@ test('faculties api respects locale query param', function () {
         'department_id' => null,
         'title' => [
             'en' => 'English Strategic Plan',
-            'ar' => 'خطة استراتيجية عربية',
+            'prs' => 'پلان ستراتیژیک دری',
         ],
         'description' => [
             'en' => 'English strategic description',
-            'ar' => 'وصف استراتيجي عربي',
+            'prs' => 'توضیح ستراتیژیک دری',
         ],
         'slug' => 'localized-strategic-plan',
     ]);
 
     $responseEn = $this->getJson('/api/v1/faculties/'.$faculty->id.'?locale=en');
-    $responseAr = $this->getJson('/api/v1/faculties/'.$faculty->id.'?locale=ar');
+    $responsePrs = $this->getJson('/api/v1/faculties/'.$faculty->id.'?locale=prs');
 
     $responseEn->assertOk()
         ->assertJsonPath('data.title', 'English Faculty')
@@ -178,12 +178,12 @@ test('faculties api respects locale query param', function () {
         ->assertJsonPath('data.departments.0.title', 'English Department')
         ->assertJsonPath('data.strategic_plans.0.title', 'English Strategic Plan');
 
-    $responseAr->assertOk()
-        ->assertJsonPath('data.title', 'كلية عربية')
-        ->assertJsonPath('data.description', 'وصف عربي')
-        ->assertJsonPath('data.deanMessage', '<p>عميد عربي</p>')
-        ->assertJsonPath('data.mission', 'مهمة عربية')
-        ->assertJsonPath('data.vision', 'رؤية عربية')
-        ->assertJsonPath('data.departments.0.title', 'قسم عربي')
-        ->assertJsonPath('data.strategic_plans.0.title', 'خطة استراتيجية عربية');
+    $responsePrs->assertOk()
+        ->assertJsonPath('data.title', 'پوهنځی دری')
+        ->assertJsonPath('data.description', 'توضیح دری')
+        ->assertJsonPath('data.deanMessage', '<p>مقام دری</p>')
+        ->assertJsonPath('data.mission', 'ماموریت دری')
+        ->assertJsonPath('data.vision', 'بینش دری')
+        ->assertJsonPath('data.departments.0.title', 'دیپارتمنت دری')
+        ->assertJsonPath('data.strategic_plans.0.title', 'پلان ستراتیژیک دری');
 });

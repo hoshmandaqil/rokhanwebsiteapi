@@ -82,6 +82,18 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Public API locales (website)
+    |--------------------------------------------------------------------------
+    |
+    | Locales accepted on API list/detail requests via ?locale= or resolved
+    | from headers. Must match Spatie translatable locales used in Filament.
+    |
+    */
+
+    'available_locales' => ['en', 'ps', 'prs'],
+
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*

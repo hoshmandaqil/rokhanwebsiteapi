@@ -2,25 +2,16 @@
 
 namespace App\Http\Resources;
 
+use App\Support\ApiLocaleTranslation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @mixin \App\Models\Career */
 class CareerResource extends JsonResource
 {
-    private function locale(): string
-    {
-        return request()->attributes->get('api_locale', config('app.fallback_locale', 'en'));
-    }
-
     private function translated(string $field): string
     {
-        $locale = $this->locale();
-        $fallback = config('app.fallback_locale', 'en');
-
-        return $this->getTranslation($field, $locale)
-            ?? $this->getTranslation($field, $fallback)
-            ?? (is_string($this->{$field}) ? $this->{$field} : '');
+        return ApiLocaleTranslation::pick($this->resource, $field);
     }
 
     /**
