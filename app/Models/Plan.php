@@ -15,6 +15,7 @@ class Plan extends Model
 {
     /** @use HasFactory<\Database\Factories\PlanFactory> */
     use HasFactory;
+
     use HasTranslations;
 
     public $translatable = ['title', 'description'];

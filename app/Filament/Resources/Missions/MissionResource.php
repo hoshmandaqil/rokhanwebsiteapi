@@ -21,6 +21,8 @@ class MissionResource extends Resource
 {
     use Translatable;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = Mission::class;
 
     protected static string|\UnitEnum|null $navigationGroup = 'About';

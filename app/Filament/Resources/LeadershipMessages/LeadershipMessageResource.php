@@ -21,6 +21,8 @@ class LeadershipMessageResource extends Resource
 {
     use Translatable;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = LeadershipMessage::class;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Leadership';

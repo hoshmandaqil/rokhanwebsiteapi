@@ -16,6 +16,7 @@ class About extends Model
 
     protected $fillable = [
         'type',
+        'page_key',
         'department_id',
         'faculty_id',
         'title',

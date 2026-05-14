@@ -21,7 +21,6 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 
-
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -36,9 +35,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->navigationGroups([
+                NavigationGroup::make()->label('Home Page'),
                 NavigationGroup::make()->label('Structure'),
                 NavigationGroup::make()->label('About'),
-                NavigationGroup::make()->label('Leadership'),
+                NavigationGroup::make()->label('Quality Assurance'),
+                NavigationGroup::make()->label('Research'),
+                NavigationGroup::make()->label('Website'),
                 NavigationGroup::make()->label('News'),
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -65,6 +67,6 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugin(SpatieTranslatablePlugin::make()
-                            ->defaultLocales(['en', 'ps', 'prs']),);
+                ->defaultLocales(['en', 'ps', 'prs']), );
     }
 }

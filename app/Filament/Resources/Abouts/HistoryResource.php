@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Abouts;
 
+use App\Filament\Concerns\ResolvesAboutFilamentRecordTitle;
 use App\Filament\Resources\Abouts\Pages\CreateHistory;
 use App\Filament\Resources\Abouts\Pages\EditHistory;
 use App\Filament\Resources\Abouts\Pages\ListHistory;
@@ -20,6 +21,7 @@ use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 
 class HistoryResource extends Resource
 {
+    use ResolvesAboutFilamentRecordTitle;
     use Translatable;
 
     protected static ?string $model = About::class;
@@ -32,7 +34,7 @@ class HistoryResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static ?int $navigationSort = 2;
+    protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $slug = 'history';
 

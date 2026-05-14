@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Plans\Schemas;
 use App\Enums\PlanScope;
 use App\Enums\PlanType;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -19,6 +20,76 @@ class PlanForm
     private static function scopeValue(mixed $scope): ?string
     {
         return $scope instanceof PlanScope ? $scope->value : (is_string($scope) ? $scope : null);
+    }
+
+    /**
+     * @return array<int, \Filament\Forms\Components\Component>
+     */
+    private static function typeTitleSlugDescriptionUploads(): array
+    {
+        return [
+            Select::make('type')
+                ->enum(PlanType::class)
+                ->options(collect(PlanType::cases())->mapWithKeys(fn (PlanType $type) => [$type->value => $type->label()])->all())
+                ->required()
+                ->native(false)
+                ->live(),
+            TextInput::make('title')
+                ->required()
+                ->maxLength(255)
+                ->live(onBlur: true)
+                ->afterStateUpdated(function (Set $set, $state): void {
+                    $title = is_string($state) ? $state : ($state[app()->getLocale()] ?? '');
+                    if (filled($title)) {
+                        $set('slug', Str::slug($title));
+                    }
+                }),
+            TextInput::make('slug')
+                ->required()
+                ->maxLength(255)
+                ->unique(ignoreRecord: true)
+                ->helperText('Auto-generated from title; you can edit it if needed.'),
+            RichEditor::make('description')
+                ->columnSpanFull(),
+            FileUpload::make('poster')
+                ->label('Poster image')
+                ->image()
+                ->directory('plans')
+                ->acceptedFileTypes(['image/*'])
+                ->maxSize(1024)
+                ->imageEditor()
+                ->columnSpanFull(),
+            FileUpload::make('file')
+                ->label('Document (max 5 MB)')
+                ->directory('plans')
+                ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
+                ->maxSize(self::FILE_MAX_SIZE_KB)
+                ->downloadable()
+                ->helperText('PDF or Word. Maximum size: 5 MB.')
+                ->columnSpanFull(),
+        ];
+    }
+
+    public static function configureForFacultyRelation(Schema $schema, int $facultyId): Schema
+    {
+        return $schema
+            ->components([
+                Hidden::make('scope')->default(PlanScope::Faculty->value),
+                Hidden::make('faculty_id')->default($facultyId),
+                Hidden::make('department_id')->default(null),
+                ...self::typeTitleSlugDescriptionUploads(),
+            ]);
+    }
+
+    public static function configureForDepartmentRelation(Schema $schema, int $departmentId): Schema
+    {
+        return $schema
+            ->components([
+                Hidden::make('scope')->default(PlanScope::Department->value),
+                Hidden::make('department_id')->default($departmentId),
+                Hidden::make('faculty_id')->default(null),
+                ...self::typeTitleSlugDescriptionUploads(),
+            ]);
     }
 
     public static function configure(Schema $schema): Schema
@@ -59,39 +130,7 @@ class PlanForm
                     ->required(fn ($get) => self::scopeValue($get('scope')) === PlanScope::Department->value)
                     ->visible(fn ($get) => self::scopeValue($get('scope')) === PlanScope::Department->value)
                     ->native(false),
-                TextInput::make('title')
-                    ->required()
-                    ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(function (Set $set, $state): void {
-                        $title = is_string($state) ? $state : ($state[app()->getLocale()] ?? '');
-                        if (filled($title)) {
-                            $set('slug', Str::slug($title));
-                        }
-                    }),
-                TextInput::make('slug')
-                    ->required()
-                    ->maxLength(255)
-                    ->unique(ignoreRecord: true)
-                    ->helperText('Auto-generated from title; you can edit it if needed.'),
-                RichEditor::make('description')
-                    ->columnSpanFull(),
-                FileUpload::make('poster')
-                    ->label('Poster image')
-                    ->image()
-                    ->directory('plans')
-                    ->acceptedFileTypes(['image/*'])
-                    ->maxSize(1024)
-                    ->imageEditor()
-                    ->columnSpanFull(),
-                FileUpload::make('file')
-                    ->label('Document (max 5 MB)')
-                    ->directory('plans')
-                    ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessorml.document'])
-                    ->maxSize(self::FILE_MAX_SIZE_KB)
-                    ->downloadable()
-                    ->helperText('PDF or Word. Maximum size: 5 MB.')
-                    ->columnSpanFull(),
+                ...array_slice(self::typeTitleSlugDescriptionUploads(), 1),
             ]);
     }
 }

@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\Departments\Schemas;
 
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class DepartmentForm
@@ -30,7 +30,7 @@ class DepartmentForm
                     ->label('Cover')
                     ->image()
                     ->acceptedFileTypes(['image/*'])
-                    ->maxSize(1024 * 10) ->imageEditor()
+                    ->maxSize(1024 * 10)->imageEditor()
                     ->directory('departments')
                     ->required()
                     ->columnSpanFull(),

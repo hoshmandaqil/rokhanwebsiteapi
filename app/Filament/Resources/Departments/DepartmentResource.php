@@ -6,6 +6,8 @@ use App\Filament\Resources\Departments\Pages\CreateDepartment;
 use App\Filament\Resources\Departments\Pages\EditDepartment;
 use App\Filament\Resources\Departments\Pages\ListDepartments;
 use App\Filament\Resources\Departments\Pages\ViewDepartment;
+use App\Filament\Resources\Departments\RelationManagers\LeadershipMessagesRelationManager;
+use App\Filament\Resources\Departments\RelationManagers\PlansRelationManager;
 use App\Filament\Resources\Departments\Schemas\DepartmentForm;
 use App\Filament\Resources\Departments\Schemas\DepartmentInfolist;
 use App\Filament\Resources\Departments\Tables\DepartmentsTable;
@@ -31,7 +33,6 @@ class DepartmentResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-
     public static function form(Schema $schema): Schema
     {
         return DepartmentForm::configure($schema);
@@ -50,7 +51,8 @@ class DepartmentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PlansRelationManager::class,
+            LeadershipMessagesRelationManager::class,
         ];
     }
 

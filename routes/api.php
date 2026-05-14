@@ -1,13 +1,17 @@
 <?php
 
-use App\Http\Controllers\Api\V1\ActivityController;
 use App\Http\Controllers\Api\V1\AboutController;
+use App\Http\Controllers\Api\V1\ActivityController;
 use App\Http\Controllers\Api\V1\AnnouncementController;
+use App\Http\Controllers\Api\V1\CareerController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\FacilityController;
 use App\Http\Controllers\Api\V1\FacultyController;
+use App\Http\Controllers\Api\V1\HomePageController;
 use App\Http\Controllers\Api\V1\NewsController;
 use App\Http\Controllers\Api\V1\ProgramController;
+use App\Http\Controllers\Api\V1\WebsiteBannerController;
+use App\Http\Controllers\Api\V1\WebsiteSettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->name('api.v1.')->group(function (): void {
@@ -21,6 +25,11 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     Route::get('activities/{activity:slug}', [ActivityController::class, 'show'])->name('activities.show');
     Route::get('announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
     Route::get('announcements/{announcement:slug}', [AnnouncementController::class, 'show'])->name('announcements.show');
+    Route::get('careers', [CareerController::class, 'index'])->name('careers.index');
+    Route::get('careers/{career:slug}', [CareerController::class, 'show'])->name('careers.show');
+    Route::get('home-page', [HomePageController::class, 'index'])->name('home-page.index');
+    Route::get('website-banners', [WebsiteBannerController::class, 'index'])->name('website-banners.index');
+    Route::get('website-settings', [WebsiteSettingController::class, 'index'])->name('website-settings.index');
     Route::get('abouts', [AboutController::class, 'index'])->name('abouts.index');
     Route::get('abouts/{slug}', [AboutController::class, 'show'])->name('abouts.show');
     Route::get('events', [EventController::class, 'index'])->name('events.index');

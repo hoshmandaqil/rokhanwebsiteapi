@@ -17,6 +17,7 @@ use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 class DepartmentsTable
 {
     use Translatable;
+
     public static function configure(Table $table): Table
     {
         return $table

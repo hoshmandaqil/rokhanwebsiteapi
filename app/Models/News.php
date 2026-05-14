@@ -11,6 +11,7 @@ class News extends Model
 {
     /** @use HasFactory<\Database\Factories\NewsFactory> */
     use HasFactory;
+
     use HasTranslations;
 
     public $translatable = ['title', 'description'];

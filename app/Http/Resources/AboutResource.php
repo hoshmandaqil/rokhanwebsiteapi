@@ -48,15 +48,47 @@ class AboutResource extends JsonResource
         return null;
     }
 
+    /**
+     * Prefer API locale, then app fallback, then any other locale with non-empty text.
+     * Spatie often returns '' for missing locales; null-coalescing alone skips real content in other languages.
+     */
     private function translated(string $field): string
     {
         $locale = $this->locale();
         $fallback = config('app.fallback_locale', 'en');
-        $raw = $this->getTranslation($field, $locale)
-            ?? $this->getTranslation($field, $fallback)
-            ?? '';
 
-        return is_string($raw) ? $raw : '';
+        /** @var array<string, mixed> $translations */
+        $translations = $this->getTranslations($field);
+
+        $nonEmpty = function (mixed $value): ?string {
+            if (! is_string($value)) {
+                return null;
+            }
+            $text = trim(str_replace("\xc2\xa0", ' ', strip_tags($value)));
+
+            return $text !== '' ? $value : null;
+        };
+
+        foreach ([$locale, $fallback] as $loc) {
+            if (! is_string($loc) || $loc === '') {
+                continue;
+            }
+            if (array_key_exists($loc, $translations)) {
+                $picked = $nonEmpty($translations[$loc]);
+                if ($picked !== null) {
+                    return $picked;
+                }
+            }
+        }
+
+        foreach ($translations as $value) {
+            $picked = $nonEmpty($value);
+            if ($picked !== null) {
+                return $picked;
+            }
+        }
+
+        return '';
     }
 
     /**
@@ -68,11 +100,13 @@ class AboutResource extends JsonResource
         $content = $this->translated('description');
         $plainDescription = trim(strip_tags($content));
         $type = $this->type instanceof AboutType ? $this->type->value : (string) $this->type;
-        $slug = Str::slug($title);
+        $pageKey = filled($this->page_key) ? (string) $this->page_key : null;
+        $slug = $pageKey ?? Str::slug($title);
 
         return [
             'id' => $this->id,
             'slug' => $slug,
+            'page_key' => $pageKey,
             'type' => $type,
             'title' => $title,
             'description' => $plainDescription,

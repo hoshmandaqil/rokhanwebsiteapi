@@ -6,6 +6,8 @@ use App\Filament\Resources\Faculties\Pages\CreateFaculty;
 use App\Filament\Resources\Faculties\Pages\EditFaculty;
 use App\Filament\Resources\Faculties\Pages\ListFaculties;
 use App\Filament\Resources\Faculties\Pages\ViewFaculty;
+use App\Filament\Resources\Faculties\RelationManagers\LeadershipMessagesRelationManager;
+use App\Filament\Resources\Faculties\RelationManagers\PlansRelationManager;
 use App\Filament\Resources\Faculties\Schemas\FacultyForm;
 use App\Filament\Resources\Faculties\Schemas\FacultyInfolist;
 use App\Filament\Resources\Faculties\Tables\FacultiesTable;
@@ -49,7 +51,8 @@ class FacultyResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PlansRelationManager::class,
+            LeadershipMessagesRelationManager::class,
         ];
     }
 
