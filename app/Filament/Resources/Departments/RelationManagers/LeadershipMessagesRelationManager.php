@@ -22,6 +22,9 @@ class LeadershipMessagesRelationManager extends RelationManager
 
     protected static ?string $title = 'Leadership messages';
 
+    // Reactive locale updates remount lazy RMs before $table is initialized.
+    protected static bool $isLazy = false;
+
     #[Reactive]
     public ?string $activeLocale = null;
 

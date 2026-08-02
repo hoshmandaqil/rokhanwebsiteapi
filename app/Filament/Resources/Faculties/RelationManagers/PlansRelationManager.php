@@ -22,6 +22,9 @@ class PlansRelationManager extends RelationManager
 
     protected static ?string $title = 'Strategic & implementation plans';
 
+    // Reactive locale updates remount lazy RMs before $table is initialized.
+    protected static bool $isLazy = false;
+
     #[Reactive]
     public ?string $activeLocale = null;
 
