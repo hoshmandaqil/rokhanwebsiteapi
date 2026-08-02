@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\AnnouncementController;
 use App\Http\Controllers\Api\V1\CareerController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\FacilityController;
+use App\Http\Controllers\Api\V1\DepartmentController;
 use App\Http\Controllers\Api\V1\FacultyController;
 use App\Http\Controllers\Api\V1\HomePageController;
 use App\Http\Controllers\Api\V1\NewsController;
@@ -19,6 +20,8 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
     Route::get('facilities/{facility:slug}', [FacilityController::class, 'show'])->name('facilities.show');
     Route::get('faculties', [FacultyController::class, 'index'])->name('faculties.index');
     Route::get('faculties/{faculty}', [FacultyController::class, 'show'])->name('faculties.show');
+    Route::get('departments', [DepartmentController::class, 'index'])->name('departments.index');
+    Route::get('departments/{identifier}', [DepartmentController::class, 'show'])->name('departments.show');
     Route::get('news', [NewsController::class, 'index'])->name('news.index');
     Route::get('news/{news:slug}', [NewsController::class, 'show'])->name('news.show');
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');

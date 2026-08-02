@@ -6,6 +6,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class DepartmentForm
@@ -18,6 +19,12 @@ class DepartmentForm
                     ->string()
                     ->label('Title')
                     ->required()
+                    ->columnSpanFull(),
+                TextInput::make('slug')
+                    ->string()
+                    ->label('Slug')
+                    ->helperText('Used in the public department URL. Leave blank to generate from the title.')
+                    ->maxLength(255)
                     ->columnSpanFull(),
                 RichEditor::make('description')
                     ->label('Description')
@@ -38,6 +45,17 @@ class DepartmentForm
                     ->label('Faculty')
                     ->relationship('faculty', 'title')
                     ->required(),
+                Section::make('Vision and Mission')
+                    ->schema([
+                        RichEditor::make('vision_content')
+                            ->label('Vision')
+                            ->columnSpanFull(),
+                        RichEditor::make('mission_content')
+                            ->label('Mission')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(1)
+                    ->columnSpanFull(),
             ]);
     }
 }

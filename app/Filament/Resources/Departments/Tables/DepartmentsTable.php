@@ -27,6 +27,9 @@ class DepartmentsTable
                 TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('slug')
+                    ->searchable()
+                    ->toggleable(),
                 TextColumn::make('description')
                     ->formatStateUsing(fn (?string $state): string => Str::limit(strip_tags($state ?? ''), 50))
                     ->searchable()
@@ -42,7 +45,7 @@ class DepartmentsTable
             ])
             ->filters([
                 SelectFilter::make('faculty_id')
-                    ->label('Program')
+                    ->label('Faculty')
                     ->relationship('faculty', 'title')
                     ->searchable()
                     ->preload(),

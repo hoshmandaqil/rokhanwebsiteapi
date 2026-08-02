@@ -53,20 +53,10 @@ class FacultyResource extends JsonResource
         $mission = ApiLocaleTranslation::pick($this->resource, 'mission_content');
         $vision = ApiLocaleTranslation::pick($this->resource, 'vision_content');
 
-        $departments = $this->departments->map(function ($department): array {
-            $deptTitle = ApiLocaleTranslation::pick($department, 'title');
-            $programDescription = ApiLocaleTranslation::pick($department, 'description');
-
-            return [
-                'id' => $department->id,
-                'title' => $deptTitle,
-                'description' => $programDescription,
-                'cover' => $this->toAbsoluteUrl($department->cover),
-                'faculty_id' => $department->faculty_id,
-                'created_at' => $department->created_at?->toIso8601String(),
-                'updated_at' => $department->updated_at?->toIso8601String(),
-            ];
-        })->values()->all();
+        $departments = $this->departments
+            ->values()
+            ->map(fn ($department) => (new DepartmentResource($department))->toArray($request))
+            ->all();
 
         $degreePrograms = collect();
         foreach ($this->departments as $department) {

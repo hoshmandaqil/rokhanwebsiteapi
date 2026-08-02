@@ -21,8 +21,11 @@ class DepartmentInfolist
                             ->weight(FontWeight::SemiBold)
                             ->placeholder('—')
                             ->columnSpanFull(),
+                        TextEntry::make('slug')
+                            ->label('Slug')
+                            ->placeholder('—'),
                         TextEntry::make('faculty.title')
-                            ->label('Program')
+                            ->label('Faculty')
                             ->placeholder('—'),
                         ImageEntry::make('cover')
                             ->label('Cover')
@@ -31,6 +34,18 @@ class DepartmentInfolist
                             ->extraImgAttributes(fn (): array => ['class' => 'rounded-lg object-cover']),
                         TextEntry::make('description')
                             ->label('Description')
+                            ->html()
+                            ->prose()
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                        TextEntry::make('vision_content')
+                            ->label('Vision')
+                            ->html()
+                            ->prose()
+                            ->placeholder('—')
+                            ->columnSpanFull(),
+                        TextEntry::make('mission_content')
+                            ->label('Mission')
                             ->html()
                             ->prose()
                             ->placeholder('—')

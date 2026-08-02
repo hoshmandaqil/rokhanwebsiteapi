@@ -22,6 +22,7 @@ class FacultyController extends Controller
 
         $faculties = Faculty::query()
             ->with([
+                'departments.faculty',
                 'departments.programs',
                 'strategicPlans',
                 'instructors',
@@ -40,6 +41,7 @@ class FacultyController extends Controller
         $this->resolveLocale($request);
 
         $faculty->loadMissing([
+            'departments.faculty',
             'departments.programs',
             'strategicPlans',
             'instructors',

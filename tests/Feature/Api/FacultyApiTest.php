@@ -99,6 +99,8 @@ test('faculties show returns single faculty item by id', function () {
         ->assertJsonPath('data.mission', 'Engineering mission')
         ->assertJsonPath('data.vision', 'Engineering vision')
         ->assertJsonPath('data.departments.0.title', 'Software Engineering')
+        ->assertJsonPath('data.departments.0.slug', 'software-engineering')
+        ->assertJsonPath('data.departments.0.href', '/departments/software-engineering')
         ->assertJsonPath('data.departments.0.faculty_id', $faculty->id)
         ->assertJsonPath('data.degreePrograms.0.slug', 'bsc-software')
         ->assertJsonPath('data.degreePrograms.0.title', 'BSc Software')
