@@ -29,6 +29,7 @@ class WebsiteSettingForm
                         FileUpload::make('logo')
                             ->label('Header logo')
                             ->image()
+                            ->disk('public')
                             ->directory('website-settings')
                             ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'])
                             ->maxSize(2048)
@@ -37,6 +38,7 @@ class WebsiteSettingForm
                             ->helperText('If empty, the site name is shown as text in the navigation.'),
                         FileUpload::make('favicon')
                             ->label('Favicon')
+                            ->disk('public')
                             ->directory('website-settings')
                             ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/webp', 'image/x-icon', 'image/vnd.microsoft.icon'])
                             ->maxSize(512)
