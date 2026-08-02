@@ -6,6 +6,7 @@ use App\Enums\AboutType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Translatable\HasTranslations;
 
 class About extends Model
@@ -22,7 +23,54 @@ class About extends Model
         'title',
         'description',
         'image',
+        'documents',
     ];
+
+    protected static function booted(): void
+    {
+        static::updating(function (About $about): void {
+            $original = $about->getOriginal('documents');
+            $originalFiles = self::documentFilePaths(is_array($original) ? $original : []);
+            $nextFiles = self::documentFilePaths(is_array($about->documents) ? $about->documents : []);
+
+            foreach (array_diff($originalFiles, $nextFiles) as $path) {
+                if (Storage::disk('local')->exists($path)) {
+                    Storage::disk('local')->delete($path);
+                }
+            }
+        });
+
+        static::deleting(function (About $about): void {
+            foreach (self::documentFilePaths(is_array($about->documents) ? $about->documents : []) as $path) {
+                if (Storage::disk('local')->exists($path)) {
+                    Storage::disk('local')->delete($path);
+                }
+            }
+        });
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $documents
+     * @return list<string>
+     */
+    private static function documentFilePaths(array $documents): array
+    {
+        return collect($documents)
+            ->map(function ($row): ?string {
+                if (! is_array($row)) {
+                    return null;
+                }
+                $file = $row['file'] ?? null;
+                if (is_array($file)) {
+                    $file = collect($file)->filter()->first();
+                }
+
+                return is_string($file) && filled($file) ? $file : null;
+            })
+            ->filter()
+            ->values()
+            ->all();
+    }
 
     /**
      * @return array<string, string>
@@ -31,6 +79,7 @@ class About extends Model
     {
         return [
             'type' => AboutType::class,
+            'documents' => 'array',
         ];
     }
 

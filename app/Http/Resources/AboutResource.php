@@ -2,46 +2,52 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\AboutPageKey;
 use App\Enums\AboutType;
 use App\Support\ApiLocaleTranslation;
+use App\Support\MediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Throwable;
 
 /** @mixin \App\Models\About */
 class AboutResource extends JsonResource
 {
-    private function toAbsoluteUrl(?string $path): ?string
+    /**
+     * @return list<array{id: int, title: string, slug: string|null, file: string|null}>
+     */
+    private function strategicPlanDocuments(): array
     {
-        if (blank($path)) {
-            return null;
-        }
+        $documents = is_array($this->documents) ? $this->documents : [];
 
-        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-            return $path;
-        }
+        return collect($documents)
+            ->values()
+            ->map(function ($row, int $index): ?array {
+                if (! is_array($row)) {
+                    return null;
+                }
 
-        $normalizedPath = ltrim($path, '/');
+                $title = trim((string) ($row['title'] ?? ''));
+                $file = $row['file'] ?? null;
+                if (is_array($file)) {
+                    $file = collect($file)->filter()->first();
+                }
+                $file = is_string($file) ? trim($file) : null;
 
-        if (str_starts_with($normalizedPath, 'storage/')) {
-            return url('/'.$normalizedPath);
-        }
+                if ($title === '') {
+                    return null;
+                }
 
-        if (Storage::disk('public')->exists($normalizedPath)) {
-            return url(Storage::disk('public')->url($normalizedPath));
-        }
-
-        if (Storage::disk('local')->exists($normalizedPath)) {
-            try {
-                return Storage::disk('local')->temporaryUrl($normalizedPath, now()->addMinutes(30));
-            } catch (Throwable) {
-                return null;
-            }
-        }
-
-        return null;
+                return [
+                    'id' => $index + 1,
+                    'title' => $title,
+                    'slug' => Str::slug($title) ?: null,
+                    'file' => MediaUrl::toAbsolute($file),
+                ];
+            })
+            ->filter()
+            ->values()
+            ->all();
     }
 
     /**
@@ -57,7 +63,7 @@ class AboutResource extends JsonResource
         $pageKey = filled($this->page_key) ? (string) $this->page_key : null;
         $slug = $pageKey ?? Str::slug($title);
 
-        return [
+        $payload = [
             'id' => $this->id,
             'slug' => $slug,
             'page_key' => $pageKey,
@@ -65,8 +71,14 @@ class AboutResource extends JsonResource
             'title' => $title,
             'description' => $plainDescription,
             'content' => $content,
-            'image' => $this->toAbsoluteUrl($this->image),
+            'image' => MediaUrl::toAbsolute($this->image),
             'link' => '/about/'.$slug,
         ];
+
+        if ($pageKey === AboutPageKey::StrategicPlan->value) {
+            $payload['documents'] = $this->strategicPlanDocuments();
+        }
+
+        return $payload;
     }
 }

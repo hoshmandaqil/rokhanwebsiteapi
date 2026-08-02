@@ -41,7 +41,7 @@ class StrategicPlanPageResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return WebsiteAboutPageForm::configure($schema, '/about/'.static::pageKey());
+        return WebsiteAboutPageForm::configure($schema, '/about/'.static::pageKey(), withDocuments: true);
     }
 
     public static function table(Table $table): Table
