@@ -23,7 +23,6 @@ class NewsFactory extends Factory
             'slug' => \Illuminate\Support\Str::slug($title).'-'.fake()->unique()->numberBetween(1, 99999),
             'description' => ['en' => fake()->paragraphs(3, true)],
             'date' => fake()->dateTimeBetween('-1 year', 'now'),
-            'cover' => 'news/'.fake()->uuid().'.jpg',
             'thumbnail' => 'news/'.fake()->uuid().'.jpg',
         ];
     }

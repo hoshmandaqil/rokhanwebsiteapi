@@ -21,7 +21,6 @@ class News extends Model
         'slug',
         'description',
         'date',
-        'cover',
         'thumbnail',
     ];
 

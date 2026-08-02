@@ -22,6 +22,7 @@ return new class extends Migration
         $rows = [
             ['slug' => 'about', 'name' => 'About page', 'sort_order' => 10],
             ['slug' => 'news', 'name' => 'News listing', 'sort_order' => 20],
+            ['slug' => 'news_details', 'name' => 'News details', 'sort_order' => 25],
             ['slug' => 'announcements', 'name' => 'Announcements listing', 'sort_order' => 30],
             ['slug' => 'events', 'name' => 'Events listing', 'sort_order' => 40],
             ['slug' => 'activities', 'name' => 'Activities listing', 'sort_order' => 50],

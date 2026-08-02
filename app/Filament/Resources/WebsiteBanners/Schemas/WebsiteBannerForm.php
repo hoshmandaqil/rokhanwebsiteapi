@@ -18,7 +18,7 @@ class WebsiteBannerForm
                     ->schema([
                         Placeholder::make('info')
                             ->label('')
-                            ->content('This image is shown at the top of the matching public page (listing or static sub-page), not on individual news posts or similar dynamic detail pages.'),
+                            ->content('This image is shown at the top of the matching public page. News details use the “News details” banner for every article; other detail pages still use their own cover images.'),
                         TextInput::make('slug')
                             ->label('Page key')
                             ->disabled()

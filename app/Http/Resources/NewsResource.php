@@ -57,8 +57,7 @@ class NewsResource extends JsonResource
             'description' => trim(strip_tags($rawDescription)),
             'content' => $rawDescription,
             'date' => $this->date?->format('F j, Y') ?? '',
-            'img' => $this->toAbsoluteUrl($this->cover) ?? '',
-            'cover' => $this->toAbsoluteUrl($this->cover),
+            'img' => $this->toAbsoluteUrl($this->thumbnail) ?? '',
             'thumbnail' => $this->toAbsoluteUrl($this->thumbnail),
             'link' => '/news/'.$this->slug,
         ];

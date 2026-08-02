@@ -18,7 +18,6 @@ class NewsInfolist
                     ->html(),
                 TextEntry::make('date')
                     ->date(),
-                ImageEntry::make('cover'),
                 ImageEntry::make('thumbnail'),
                 TextEntry::make('created_at')
                     ->dateTime()

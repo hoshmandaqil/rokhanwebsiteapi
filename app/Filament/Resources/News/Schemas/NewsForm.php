@@ -37,13 +37,6 @@ class NewsForm
                 DatePicker::make('date')
                     ->required()
                     ->native(false),
-                FileUpload::make('cover')
-                    ->image()
-                    ->acceptedFileTypes(['image/*'])
-                    ->maxSize(2048 * 2)
-                    ->imageEditor()
-                    ->columnSpanFull()
-                    ->required(),
                 FileUpload::make('thumbnail')
                     ->image()
                     ->acceptedFileTypes(['image/*'])

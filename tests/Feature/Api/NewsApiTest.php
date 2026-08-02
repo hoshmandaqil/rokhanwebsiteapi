@@ -13,7 +13,7 @@ test('news index returns paginated news items', function () {
     $response->assertOk()
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'slug', 'title', 'description', 'content', 'date', 'img', 'cover', 'thumbnail', 'link'],
+                '*' => ['id', 'slug', 'title', 'description', 'content', 'date', 'img', 'thumbnail', 'link'],
             ],
             'meta' => ['current_page', 'last_page', 'per_page', 'total'],
         ])
@@ -32,7 +32,7 @@ test('news index supports limit query', function () {
     $response->assertOk()
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'slug', 'title', 'description', 'content', 'date', 'img', 'cover', 'thumbnail', 'link'],
+                '*' => ['id', 'slug', 'title', 'description', 'content', 'date', 'img', 'thumbnail', 'link'],
             ],
         ]);
 
@@ -51,7 +51,6 @@ test('news show returns single news item by slug', function () {
         'title' => ['en' => 'Test News'],
         'description' => ['en' => '<p>News description</p>'],
         'slug' => 'test-news',
-        'cover' => 'news/test-cover.jpg',
         'thumbnail' => 'news/test-thumbnail.jpg',
     ]);
 
